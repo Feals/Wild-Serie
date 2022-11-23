@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\Service\ProgramDuration;
 
 #[Route('/program', name: 'program_')]
 class ProgramController extends AbstractController
@@ -32,14 +33,15 @@ class ProgramController extends AbstractController
     }
 
     #[Route('/show/{slug}', methods: ["GET"], name: 'show')]
-    public function show(?Program $program): Response
+    public function show(?Program $program, ProgramDuration $programDuration): Response
     {
         if (is_null($program)) {
             throw $this->createNotFoundException();
         }
 
         return $this->render('program/show.html.twig', [
-            'program' => $program
+            'program' => $program,
+            'programDuration' => $programDuration->calculate($program)
         ]);
     }
 
