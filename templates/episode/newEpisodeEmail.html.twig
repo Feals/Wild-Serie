@@ -1,0 +1,14 @@
+{% extends "layoutProgramEmail.html.twig" %}
+{% block title %}Nouvel Episode
+{% endblock %}
+
+{% block body %}
+	<h1>Nouvel Episode
+		{{ episode.title }}
+		ajouté</h1>
+	<p>Bonjour à tous, le nouvel épisode :
+		{{ episode.title }}
+		a été ajouté sur Wild Series</p>
+	<p>Série :{{program.title }}
+	</p>
+{% endblock %}

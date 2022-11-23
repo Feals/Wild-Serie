@@ -18,6 +18,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use App\Service\ProgramDuration;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mailer\MailerInterface;
 
 #[Route('/program', name: 'program_')]
 class ProgramController extends AbstractController
@@ -113,10 +115,10 @@ class ProgramController extends AbstractController
 
     #[Route('/new', methods: ["GET", "POST"], name: "new")]
     public function new(
-        Request $request,
+        Request $request, MailerInterface $mailer,
         ProgramRepository $programRepository,
         SluggerInterface $slugger,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,        
     ): Response {
         $program = new Program();
         $form = $this->createForm(ProgramType::class, $program);
@@ -129,7 +131,21 @@ class ProgramController extends AbstractController
 
             if ($validator->validate($program)) {
                 $programRepository->save($program, true);
+
+                $email = (new Email())
+
+                ->from($this->getParameter('mailer_from'))
+
+                ->to($this->getParameter('mailer_to'))
+
+                ->subject('Une nouvelle série vient d\'être publiée !')
+
+                ->html($this->renderView('Program/newProgramEmail.html.twig', ['program' => $program]));
+                $mailer->send($email);
+
             }
+
+            
             return $this->redirectToRoute('program_index');
         }
 
